@@ -38,10 +38,8 @@ export const Header: React.FC = () => {
   };
 
   const handleLogout = () => {
-    console.log("entered");
-    dispatch(logoutAction(false));
-    console.log({ isLoggedIn });
     handleCloseUserMenu();
+    dispatch(logoutAction(false));
     navigate("/login");
   };
 
@@ -61,8 +59,6 @@ export const Header: React.FC = () => {
       navigate("/login");
     }
   };
-
-  console.log({ isLoggedIn });
 
   return (
     <AppBar position="sticky" sx={{ backgroundColor: "#1976d2" }}>

@@ -35,7 +35,6 @@ const quizSlice = createSlice({
     logoutAction: (state: any, action: { payload: boolean }) => {
       // state.isAuthenticated = false;
       // state.user = null;
-      console.log({ action });
 
       state.isLoggedIn = action.payload;
     },
