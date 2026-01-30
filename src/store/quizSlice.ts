@@ -1,9 +1,7 @@
-// store/quizSlice.js (using Redux Toolkit)
+// store/quizSlice.ts (using Redux Toolkit)
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 type QuizSliceInitialStateType = {
-  // isLoggedIn: boolean;
-  // role: string;
   questions: any[];
   selectedQuizId: number;
   selectedQuizQuestions: any[];
@@ -12,11 +10,6 @@ type QuizSliceInitialStateType = {
 };
 
 const initialState: QuizSliceInitialStateType = {
-  // isAuthenticated: false,
-  // user: null,
-
-  // isLoggedIn: false,
-  // role: "USER",
   questions: [],
   selectedQuizId: -1,
   selectedQuizQuestions: [],
@@ -28,19 +21,6 @@ const quizSlice = createSlice({
   name: "quiz",
   initialState,
   reducers: {
-    // loginAction: (state: any, action: { payload: boolean }) => {
-    //   // state.isAuthenticated = true;
-    //   // state.user = action.payload;
-    //   state.isLoggedIn = action.payload;
-    // },
-    // logoutAction: (state: any, action: { payload: boolean }) => {
-    //   // state.isAuthenticated = false;
-    //   // state.user = null;
-    //   state.isLoggedIn = action.payload;
-    // },
-    // roleAction: (state: any, action: { payload: string }) => {
-    //   state.role = action.payload;
-    // },
     selectedQuizIdAction: (state: any, action: { payload: number }) => {
       state.selectedQuizId = action.payload;
     },
@@ -68,9 +48,6 @@ const quizSlice = createSlice({
 });
 
 export const {
-  // loginAction,
-  // logoutAction,
-  // roleAction,
   selectedQuizIdAction,
   selectedQuizQuestionsAction,
   allQuizIdsAction,

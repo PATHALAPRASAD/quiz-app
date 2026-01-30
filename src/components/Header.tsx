@@ -49,15 +49,9 @@ export const Header: React.FC = () => {
   };
 
   const handleClickMenuIcon = () => {
-    if (isAuthenticated) {
-      if (role === ADMIN) {
-        navigate("/admin");
-      } else {
-        navigate("/user");
-      }
-    } else {
-      navigate("/login");
-    }
+    navigate(
+      isAuthenticated ? (role === ADMIN ? "/admin" : "/user") : "/login",
+    );
   };
 
   return (
