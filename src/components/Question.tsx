@@ -17,6 +17,7 @@ export const Question: React.FC<QuestionProps> = ({
   options,
   onAnswerChange,
   currentValue,
+  questionNumber,
 }: any) => {
   return (
     <Paper
@@ -31,7 +32,7 @@ export const Question: React.FC<QuestionProps> = ({
     >
       <Box mb={2} sx={{ display: "flex", justifyContent: "start" }}>
         <Typography variant="h6" component="legend" sx={{ fontWeight: 600 }}>
-          {id}. {questionText}
+          {questionNumber}. {questionText}
         </Typography>
       </Box>
 

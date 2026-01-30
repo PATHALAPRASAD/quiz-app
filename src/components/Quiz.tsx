@@ -2,21 +2,34 @@ import { Delete, Edit, PlayArrow } from "@mui/icons-material";
 import { Paper, Stack, Tooltip, Typography } from "@mui/material";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { allQuestions } from "../stub_db/stub_data_questions";
 import {
   selectedQuizIdAction,
   selectedQuizQuestionsAction,
 } from "../store/quizSlice";
+import axios from "axios";
+
+const quizList: any[] = [1, 2];
 
 export const Quiz = ({ quizId }: any) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  const getQuestionsByQuizId = async () => {
+    const url: string =
+      "http://localhost:6004/api/questions/byQuizId/" + quizId;
+    const res: any = await axios.get(url);
+    console.log({ res });
+    if (res.data.length > 0) {
+      dispatch(selectedQuizQuestionsAction([...res.data]));
+    }
+  };
+
   const playQuiz = () => {
+    getQuestionsByQuizId();
     dispatch(selectedQuizIdAction(quizId));
     dispatch(
       selectedQuizQuestionsAction(
-        allQuestions.filter((x: any) => x.quizId === quizId),
+        quizList.filter((x: any) => x.quizId === quizId),
       ),
     );
     navigate("/play-quiz");

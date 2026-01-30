@@ -1,7 +1,6 @@
 import { Paper, Stack, Typography } from "@mui/material";
 import { useState } from "react";
 import { Question } from "./Question";
-// import { allQuestions } from "../stub_db/stub_data_questions";
 import { useSelector } from "react-redux";
 
 export const PlayQuiz = () => {
@@ -12,6 +11,9 @@ export const PlayQuiz = () => {
   );
   const selectedQuizQuestions: any = useSelector(
     (state: any) => state.quiz.selectedQuizQuestions,
+  );
+  const allQuizCategories: any = useSelector(
+    (state: any) => state.quiz.allQuizCategories,
   );
 
   const handleAnswerChange = (questionId: string, choice: string) => {
@@ -35,28 +37,31 @@ export const PlayQuiz = () => {
         sx={{
           mb: 3,
           display: "flex",
-          justifyContent: "space-between",
+          justifyContent: "start",
           alignItems: "center",
         }}
       >
         <Typography variant="h4" color="primary">
           Quiz - {selectedQuizId}
         </Typography>
-        <Typography>{selectedQuizQuestions[0].tech}</Typography>
+        <Typography>
+          {
+            allQuizCategories.find(
+              (x: any) => x.id === selectedQuizQuestions[0]?.quizCategoryId,
+            )?.tech
+          }
+        </Typography>
       </Stack>
 
-      {
-        // allQuestions
-        //   .filter((q: any) => q.quizId === selectedQuizId)
-        selectedQuizQuestions.map((q: any) => (
-          <Question
-            key={q.id}
-            {...q}
-            onAnswerChange={handleAnswerChange}
-            currentValue={answers[q.id]}
-          />
-        ))
-      }
+      {selectedQuizQuestions.map((question: any, questionIndex: number) => (
+        <Question
+          key={question.id}
+          questionNumber={questionIndex + 1}
+          {...question}
+          onAnswerChange={handleAnswerChange}
+          currentValue={answers[question.id]}
+        />
+      ))}
     </Paper>
   );
 };

@@ -15,7 +15,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { ADMIN } from "../constants/constants";
-import { logoutAction } from "../store/quizSlice";
+import { logoutAction } from "../store/authSlice";
 
 export const Header: React.FC = () => {
   const navigate = useNavigate();
@@ -24,10 +24,10 @@ export const Header: React.FC = () => {
   // State for User Profile Dropdown
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
 
-  // const isLoggedIn = useSelector((state: any) => state.LoginReducer.isLoggedIn);
-  const isLoggedIn = useSelector((state: any) => state.quiz.isLoggedIn);
-  // const role = useSelector((state: any) => state.LoginReducer.role);
-  const role = useSelector((state: any) => state.quiz.role);
+  const isAuthenticated = useSelector(
+    (state: any) => state.auth.isAuthenticated,
+  );
+  const role = useSelector((state: any) => state.auth.role);
 
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElUser(event.currentTarget);
@@ -49,7 +49,7 @@ export const Header: React.FC = () => {
   };
 
   const handleClickMenuIcon = () => {
-    if (isLoggedIn) {
+    if (isAuthenticated) {
       if (role === ADMIN) {
         navigate("/admin");
       } else {
@@ -127,7 +127,7 @@ export const Header: React.FC = () => {
             >
               Account
             </MenuItem>
-            {isLoggedIn ? (
+            {isAuthenticated ? (
               <MenuItem onClick={handleLogout}>Logout</MenuItem>
             ) : (
               <MenuItem onClick={handleLogin}>Login</MenuItem>

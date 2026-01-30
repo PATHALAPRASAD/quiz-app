@@ -13,8 +13,9 @@ import {
   Tooltip,
 } from "@mui/material";
 import { useState } from "react";
-import { allQuestions } from "../stub_db/stub_data_questions";
 import { Question } from "./Question";
+
+const allQuestions: any[] = [];
 
 const initialInputData: any = {
   tech: "",
@@ -91,6 +92,7 @@ export const CreateQuiz = () => {
       {allQuestions.map((q: any) => (
         <Question
           key={q.id}
+          q
           {...q}
           onAnswerChange={handleAnswerChange}
           currentValue={answers[q.id]}

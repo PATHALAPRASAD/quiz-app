@@ -2,10 +2,11 @@ import { Add } from "@mui/icons-material";
 import { Paper, Stack, Tooltip, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { Quiz } from "./Quiz";
-import { allQuestions } from "../stub_db/stub_data_questions";
+import { useSelector } from "react-redux";
 
 export const Admin = () => {
   const navigate = useNavigate();
+  const allQuizIds = useSelector((state: any) => state.quiz.allQuizIds);
 
   return (
     <Paper
@@ -27,7 +28,9 @@ export const Admin = () => {
           alignItems: "center",
         }}
       >
-        <Typography p={2}>Quizzes List</Typography>
+        <Typography variant="h4" p={2}>
+          Quizzes List
+        </Typography>
         <Tooltip title="Add Quiz">
           <Add
             sx={{ border: "1px solid" }}
@@ -37,11 +40,9 @@ export const Admin = () => {
       </Stack>
 
       <Stack spacing={2} direction={"column"}>
-        {Array.from(new Set(allQuestions.map((q: any) => q.quizId))).map(
-          (_q: any, qIndex: number) => (
-            <Quiz key={qIndex} quizId={qIndex + 1} />
-          ),
-        )}
+        {allQuizIds.map((q: any, qIndex: number) => (
+          <Quiz key={qIndex} quizId={q} />
+        ))}
       </Stack>
     </Paper>
   );
