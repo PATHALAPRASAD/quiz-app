@@ -54,7 +54,7 @@ export const {
   allQuizCategoriesAction,
 } = quizSlice.actions;
 
-export default quizSlice.reducer;
+export const quizReducer = quizSlice.reducer;
 
 // ============================================================
 // First, create the thunk

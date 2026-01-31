@@ -1,24 +1,15 @@
 import { configureStore } from "@reduxjs/toolkit";
-
-// ================================================================
-
-import rootReducer from "../reducers/rootReducer";
+import { authReducer } from "./authSlice";
+import { quizReducer } from "./quizSlice";
 
 export const store = configureStore({
-  reducer: rootReducer,
+  reducer: {
+    auth: authReducer,
+    quiz: quizReducer,
+  },
+
+  // middleware: (getDefaultMiddleware) =>
+  //   getDefaultMiddleware({
+  //     serializableCheck: false,
+  //   }),
 });
-
-// ================================================================
-
-// import quizSlice from "../slices/quizSlice";
-
-// export const store = configureStore({
-//   reducer: {
-//     quiz: quizSlice,
-//   },
-
-//   //   middleware: (getDefaultMiddleware) =>
-//   //     getDefaultMiddleware({
-//   //       serializableCheck: false,
-//   //     }),
-// });
