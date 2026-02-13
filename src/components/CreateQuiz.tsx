@@ -64,7 +64,7 @@ export const CreateQuiz = () => {
         ),
       );
     }
-  }, [tech]);
+  }, [tech, allQuizCategories, allQuestions]);
 
   const handleTextChange = (e: any) => {
     const { name, value } = e.target;

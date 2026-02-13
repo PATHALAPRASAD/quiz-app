@@ -62,17 +62,17 @@ export const Login: React.FC = () => {
     }
   };
 
-  const getQuizIdsByCategoryId = async () => {
-    const url: string = `${BASE_URL}/api/questions/distinct/quiz-ids-by-tech-id/1`;
-    try {
-      const res: any = await axios.get(url);
-      if (res.data.length > 0) {
-        dispatch(allQuizIdsAction([...res.data]));
-      }
-    } catch (error) {
-      console.log({ error });
-    }
-  };
+  // const getQuizIdsByCategoryId = async () => {
+  //   const url: string = `${BASE_URL}/api/questions/distinct/quiz-ids-by-tech-id/1`;
+  //   try {
+  //     const res: any = await axios.get(url);
+  //     if (res.data.length > 0) {
+  //       dispatch(allQuizIdsAction([...res.data]));
+  //     }
+  //   } catch (error) {
+  //     console.log({ error });
+  //   }
+  // };
 
   const getAllQuizCategories = async () => {
     try {
@@ -121,7 +121,7 @@ export const Login: React.FC = () => {
 
   useEffect(() => {
     onPageLoad();
-  }, []);
+  }, [onPageLoad]);
 
   const validate = (name: string, value: string) => {
     let errMsg = "";
