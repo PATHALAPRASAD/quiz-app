@@ -1,5 +1,6 @@
 import { AddOutlined } from "@mui/icons-material";
 import {
+  Autocomplete,
   Box,
   Button,
   Dialog,
@@ -11,37 +12,134 @@ import {
   Stack,
   TextField,
   Tooltip,
+  Typography,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Question } from "./Question";
-
-const allQuestions: any[] = [];
+import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
+import { allQuestionsAction, allQuizIdsAction } from "../store/quizSlice";
+import { BASE_URL, QUIZ_SIZE } from "../constants/constants";
 
 const initialInputData: any = {
-  tech: "",
   questionText: "",
   option1: "",
   option2: "",
   option3: "",
   option4: "",
   answer: "",
+
+  // questionText: "questionText",
+  // option1: "option1",
+  // option2: "option2",
+  // option3: "option3",
+  // option4: "option4",
+  // answer: "option2",
 };
 
 export const CreateQuiz = () => {
+  const dispatch = useDispatch();
+
+  const allQuizCategories = useSelector(
+    (state: any) => state.quiz.allQuizCategories,
+  );
+  const allQuizIds = useSelector((state: any) => state.quiz.allQuizIds);
+  const allQuestions = useSelector((state: any) => state.quiz.allQuestions);
+
   const [open, setOpen] = useState<boolean>(false);
   const [inputData, setInputData] = useState<any>(initialInputData);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [tech, setTech] = useState<string>("");
-  const [isTechError, setIsTechError] = useState<boolean>(false);
-  const [techErrorMessage, setTechErrorMessage] = useState<string>("");
+  const [filteredQuestions, setFilteredQuestions] =
+    useState<any[]>(allQuestions);
+
+  useEffect(() => {
+    if (tech) {
+      const selectedQuizCategoryIdByTech: any = allQuizCategories.find(
+        (x: any) => x.tech === tech,
+      )?.id;
+      setFilteredQuestions(
+        allQuestions.filter(
+          (x: any) => x.quizCategoryId === selectedQuizCategoryIdByTech,
+        ),
+      );
+    }
+  }, [tech]);
 
   const handleTextChange = (e: any) => {
     const { name, value } = e.target;
     setInputData((x: any) => ({ ...x, [name]: value }));
   };
 
-  const handleSave = () => {
-    alert(JSON.stringify(inputData));
+  const handleDropdownChange = (_event: any, value: any) => {
+    setTech(value);
+    const selectedQuizCategoryIdByTech: any = allQuizCategories.find(
+      (x: any) => x.tech === value,
+    )?.id;
+    if (value) {
+      setFilteredQuestions(
+        allQuestions.filter(
+          (x: any) => x.quizCategoryId === selectedQuizCategoryIdByTech,
+        ),
+      );
+    } else {
+      setFilteredQuestions(allQuestions);
+    }
+  };
+
+  const handleSave = async () => {
+    const selectedQuizCategoryIdByTech: any = allQuizCategories.find(
+      (x: any) => x.tech === tech,
+    )?.id;
+    const quizIdsBySelectedQuizCategoryId: any[] = allQuestions
+      .filter((y: any) => y.quizCategoryId === selectedQuizCategoryIdByTech)
+      .map((z: any) => z.quizId);
+    console.log({ selectedQuizCategoryIdByTech });
+    console.log({ quizIdsBySelectedQuizCategoryId });
+
+    const maxQuizId: number = Math.max(...quizIdsBySelectedQuizCategoryId);
+    const maxQuizIdsCount = quizIdsBySelectedQuizCategoryId.filter(
+      (x: number) => x === maxQuizId,
+    ).length;
+
+    console.log({ maxQuizIdsCount });
+
+    const options: string[] = [
+      inputData.option1,
+      inputData.option2,
+      inputData.option3,
+      inputData.option4,
+    ];
+    let request: any = {
+      id: Math.max(...allQuestions.map((x: any) => x.id)) + 1,
+      questionText: inputData.questionText,
+      options,
+      answer: inputData.answer,
+      quizCategoryId: selectedQuizCategoryIdByTech,
+    };
+
+    if (maxQuizIdsCount !== 0 && maxQuizIdsCount < QUIZ_SIZE) {
+      // adding question to existing quiz
+      request.quizId = Math.max(...quizIdsBySelectedQuizCategoryId);
+    } else {
+      // creating new quiz
+      request.quizId = Math.max(...allQuizIds) + 1;
+    }
+    try {
+      const url: string = `${BASE_URL}/api/questions`;
+      const res: any = await axios.post(url, request);
+      console.log("res.data.id : ", res.data.id);
+      if (res.data.id > -1) {
+        console.log("log add question success");
+        dispatch(allQuestionsAction([...allQuestions, res.data]));
+        if (!allQuizIds.includes(request.quizId)) {
+          dispatch(allQuizIdsAction([...allQuizIds, request.quizId]));
+        }
+        setInputData(initialInputData);
+      }
+    } catch (error) {
+      console.log({ error });
+    }
     setOpen(false);
   };
 
@@ -52,11 +150,7 @@ export const CreateQuiz = () => {
   const addQuestion = () => {
     if (tech) {
       setOpen(true);
-      setIsTechError(false);
-      setTechErrorMessage("");
     } else {
-      setIsTechError(true);
-      setTechErrorMessage("Please enter Tech");
     }
   };
 
@@ -72,15 +166,22 @@ export const CreateQuiz = () => {
           // alignItems: "start",
         }}
       >
-        <TextField
-          id="tech"
-          name="tech"
-          label={"Tech"}
+        <Autocomplete
+          options={allQuizCategories.map((c: any) => c.tech)}
+          renderInput={(params) => <TextField {...params} label="Tech" />}
           value={tech}
-          onChange={(e: any) => setTech(e.target.value)}
-          error={isTechError}
-          helperText={techErrorMessage}
+          onChange={(_event, newValue) =>
+            handleDropdownChange(_event, newValue)
+          }
+          freeSolo
+          sx={{
+            textAlign: "center",
+            mx: 10,
+            my: 2,
+            width: "200px",
+          }}
         />
+        <Typography>Questions Count : {filteredQuestions.length}</Typography>
         <Tooltip title="Add Question">
           <AddOutlined
             sx={{ mr: 2, border: "1px solid", ":hover": { bgcolor: "cyan" } }}
@@ -89,13 +190,14 @@ export const CreateQuiz = () => {
         </Tooltip>
       </Stack>
 
-      {allQuestions.map((q: any) => (
+      {filteredQuestions.map((q: any) => (
         <Question
           key={q.id}
           q
           {...q}
           onAnswerChange={handleAnswerChange}
           currentValue={answers[q.id]}
+          createMode={true}
         />
       ))}
       <Dialog
@@ -123,8 +225,8 @@ export const CreateQuiz = () => {
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
-                id="option_1"
-                name="option_1"
+                id="option1"
+                name="option1"
                 label={"Option - 1"}
                 value={inputData.option1}
                 fullWidth
@@ -133,8 +235,8 @@ export const CreateQuiz = () => {
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
-                id="option_2"
-                name="option_2"
+                id="option2"
+                name="option2"
                 label={"Option - 2"}
                 value={inputData.option2}
                 fullWidth
@@ -143,8 +245,8 @@ export const CreateQuiz = () => {
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
-                id="option_3"
-                name="option_3"
+                id="option3"
+                name="option3"
                 label={"Option - 3"}
                 value={inputData.option3}
                 fullWidth
@@ -153,10 +255,20 @@ export const CreateQuiz = () => {
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
-                id="option_4"
-                name="option_4"
+                id="option4"
+                name="option4"
                 label={"Option - 4"}
                 value={inputData.option4}
+                fullWidth
+                onChange={handleTextChange}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
+                id="answer"
+                name="answer"
+                label={"Answer"}
+                value={inputData.answer}
                 fullWidth
                 onChange={handleTextChange}
               />

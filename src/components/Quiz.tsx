@@ -1,35 +1,39 @@
 import { Delete, Edit, PlayArrow } from "@mui/icons-material";
 import { Paper, Stack, Tooltip, Typography } from "@mui/material";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
   selectedQuizIdAction,
   selectedQuizQuestionsAction,
 } from "../store/quizSlice";
-import axios from "axios";
-
-const quizList: any[] = [1, 2];
+// import axios from "axios";
 
 export const Quiz = ({ quizId }: any) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const getQuestionsByQuizId = async () => {
-    const url: string =
-      "http://localhost:6004/api/questions/byQuizId/" + quizId;
-    const res: any = await axios.get(url);
-    console.log({ res });
-    if (res.data.length > 0) {
-      dispatch(selectedQuizQuestionsAction([...res.data]));
-    }
-  };
+  const allQuizCategories = useSelector(
+    (state: any) => state.quiz.allQuizCategories,
+  );
+
+  const allQuestions = useSelector((state: any) => state.quiz.allQuestions);
+
+  // const getQuestionsByQuizId = async () => {
+  // const url: string =
+  //   `${BASE_URL}/api/questions/byQuizId/${quizId}`;
+  // const res: any = await axios.get(url);
+  // console.log({ res });
+  // if (res.data.length > 0) {
+  //   dispatch(selectedQuizQuestionsAction([...res.data]));
+  // }
+  // };
 
   const playQuiz = () => {
-    getQuestionsByQuizId();
+    // getQuestionsByQuizId();
     dispatch(selectedQuizIdAction(quizId));
     dispatch(
       selectedQuizQuestionsAction(
-        quizList.filter((x: any) => x.quizId === quizId),
+        allQuestions.filter((x: any) => x.quizId === quizId),
       ),
     );
     navigate("/play-quiz");
@@ -63,7 +67,16 @@ export const Quiz = ({ quizId }: any) => {
           }}
         >
           <Typography variant="h6">Quiz - {quizId}</Typography>
-          <Typography variant="body2">React</Typography>
+          <Typography variant="body2">
+            {
+              allQuizCategories.find(
+                (x: any) =>
+                  x.id ===
+                  allQuestions.find((y: any) => y.quizId === quizId)
+                    ?.quizCategoryId,
+              )?.tech
+            }
+          </Typography>
         </Stack>
         <Tooltip title="Play Quiz">
           <PlayArrow

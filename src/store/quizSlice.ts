@@ -7,6 +7,7 @@ type QuizSliceInitialStateType = {
   selectedQuizQuestions: any[];
   allQuizIds: any[];
   allQuizCategories: any[];
+  allQuestions: any[];
 };
 
 const initialState: QuizSliceInitialStateType = {
@@ -15,6 +16,7 @@ const initialState: QuizSliceInitialStateType = {
   selectedQuizQuestions: [],
   allQuizIds: [],
   allQuizCategories: [],
+  allQuestions: [],
 };
 
 const quizSlice = createSlice({
@@ -32,6 +34,9 @@ const quizSlice = createSlice({
     },
     allQuizCategoriesAction: (state: any, action: { payload: any }) => {
       state.allQuizCategories = action.payload;
+    },
+    allQuestionsAction: (state: any, action: { payload: any }) => {
+      state.allQuestions = action.payload;
     },
   },
   extraReducers(builder) {
@@ -52,6 +57,7 @@ export const {
   selectedQuizQuestionsAction,
   allQuizIdsAction,
   allQuizCategoriesAction,
+  allQuestionsAction,
 } = quizSlice.actions;
 
 export const quizReducer = quizSlice.reducer;

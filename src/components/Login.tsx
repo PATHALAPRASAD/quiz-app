@@ -15,10 +15,16 @@ import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import { Footer } from "./Footer";
 
 import { useDispatch } from "react-redux";
-import { ADMIN, USER } from "../constants/constants";
-import { allQuizCategoriesAction, allQuizIdsAction } from "../store/quizSlice";
+import { ADMIN, BASE_URL, USER } from "../constants/constants";
+import {
+  allQuestionsAction,
+  allQuizCategoriesAction,
+  allQuizIdsAction,
+} from "../store/quizSlice";
 import axios from "axios";
 import { loginAction, roleAction } from "../store/authSlice";
+
+let initialPageLoading: boolean = true;
 
 type Role = "ADMIN" | "USER";
 
@@ -43,10 +49,11 @@ export const Login: React.FC = () => {
   const [errorMessages, setErrorMessages] = useState(initialErrorMessages);
 
   const getAllQuizIds = async () => {
-    const url: string = "http://localhost:6004/api/questions/distinct/quiz-ids";
+    const url: string = `${BASE_URL}/api/questions/distinct/quiz-ids`;
+    // const url2: string =
+    //   "${BASE_URL}/api/questions/distinct/quiz-ids-by-tech-id/1";
     try {
       const res: any = await axios.get(url);
-      console.log({ res });
       if (res.data.length > 0) {
         dispatch(allQuizIdsAction([...res.data]));
       }
@@ -55,24 +62,66 @@ export const Login: React.FC = () => {
     }
   };
 
+  const getQuizIdsByCategoryId = async () => {
+    const url: string = `${BASE_URL}/api/questions/distinct/quiz-ids-by-tech-id/1`;
+    try {
+      const res: any = await axios.get(url);
+      if (res.data.length > 0) {
+        dispatch(allQuizIdsAction([...res.data]));
+      }
+    } catch (error) {
+      console.log({ error });
+    }
+  };
+
+  const getAllQuizCategories = async () => {
+    try {
+      const url: string = `${BASE_URL}/api/quiz-categories`;
+      const res: any = await axios.get(url);
+      if (res.data.length > 0) {
+        dispatch(allQuizCategoriesAction([...res.data]));
+      }
+    } catch (error) {
+      console.log({ error });
+    }
+  };
+
+  const getAllQuestions = async () => {
+    try {
+      const url: string = `${BASE_URL}/api/questions`;
+      const res: any = await axios.get(url);
+      if (res.data.length > 0) {
+        dispatch(allQuestionsAction([...res.data]));
+        const frequencies = (arr: any) =>
+          arr.reduce((x: any, i: number) => {
+            x[i] = (x[i] ?? 0) + 1;
+            return x;
+          }, {});
+        // console.log(frequencies(["a", "b", "a", "c", "a", "a", "b"]));
+        // { a: 4, b: 2, c: 1 }
+        // frequencies([..."ball"]);
+        // { b: 1, a: 1, l: 2 }
+
+        console.log(frequencies(res.data.map((x: any) => x.quizId)));
+      }
+    } catch (error) {
+      console.log({ error });
+    }
+  };
+
   const onPageLoad = async () => {
-    getAllQuizCategories();
-    getAllQuizIds();
+    if (initialPageLoading) {
+      getAllQuizCategories();
+      getAllQuizIds();
+      // getQuizIdsByCategoryId();
+      getAllQuestions();
+      initialPageLoading = false;
+    }
   };
 
   useEffect(() => {
     onPageLoad();
   }, []);
-
-  const getAllQuizCategories = async () => {
-    try {
-      const url: string = "http://localhost:6004/api/quiz-categories";
-      const res: any = await axios.get(url);
-      if (res.data.length > 0) {
-        dispatch(allQuizCategoriesAction([...res.data]));
-      }
-    } catch (error) {}
-  };
 
   const validate = (name: string, value: string) => {
     let errMsg = "";
@@ -139,17 +188,18 @@ export const Login: React.FC = () => {
     //   const request: any = {
     //     email: inputData.email,
     //     password: inputData.password,
+    //     role: inputData.role,
     //   };
 
     //   console.log({ request });
 
     //   const res: any = await axios.post(
-    //     "http://localhost:6004/api/users/authenticate",
+    //     `${BASE_URL}/api/users/authenticate`,
     //     request,
     //   );
     //   console.log({ res });
 
-    //   if (res.data.isAuthenticated) {
+    //   if (res.data.isLoggedIn) {
     //     dispatch(loginAction(true));
     //     dispatch(roleAction(inputData.role));
 
@@ -162,12 +212,14 @@ export const Login: React.FC = () => {
     //         isEmailError: true,
     //         emailErrorMessage: res.data.errorMessage,
     //       });
-    //     } else {
+    //     } else if (res.data.errorMessage?.toLowerCase().includes("password")) {
     //       setErrorMessages({
     //         ...initialErrorMessages,
     //         isPasswordError: true,
     //         passwordErrorMessage: res.data.errorMessage,
     //       });
+    //     } else {
+    //       alert(res.data.errorMessage);
     //     }
     //     console.log("error : ", res.data.errorMessage);
     //   }
